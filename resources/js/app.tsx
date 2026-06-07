@@ -34,19 +34,36 @@ createInertiaApp({
 initializeTheme();
 
 // Initialize Laravel Echo with Reverb for real-time threat monitoring
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
-
-if (import.meta.env.VITE_REVERB_APP_KEY) {
-    window.Pusher = Pusher;
-    window.Echo = new Echo({
-        broadcaster: 'reverb',
-        key: import.meta.env.VITE_REVERB_APP_KEY,
-        wsHost: import.meta.env.VITE_REVERB_HOST || 'localhost',
-        wsPort: import.meta.env.VITE_REVERB_PORT || 8080,
-        wssPort: import.meta.env.VITE_REVERB_PORT || 8080,
-        forceTLS: (import.meta.env.VITE_REVERB_SCHEME || 'http') === 'https',
-        enabledTransports: ['ws', 'wss'],
-        client: Pusher,
-    });
+if (typeof window !== 'undefined' && import.meta.env.VITE_REVERB_APP_KEY) {
+    Promise.all([import('pusher-js'), import('laravel-echo')]).then(
+        ([pusherMod, echoMod]) => {
+            const PusherConstructor =
+                (pusherMod as Record<string, unknown>).default || pusherMod;
+            const Pusher =
+                (PusherConstructor as Record<string, unknown>).Pusher ||
+                PusherConstructor;
+            if (typeof Pusher !== 'function') return;
+            window.Pusher = Pusher;
+            const Echo =
+                (echoMod as Record<string, unknown>).default || echoMod;
+            window.Echo = new (Echo as new (...args: unknown[]) => {
+                channel: (name: string) => {
+                    listen: (
+                        event: string,
+                        callback: (...args: unknown[]) => void,
+                    ) => void;
+                };
+                leaveChannel: (name: string) => void;
+            })({
+                broadcaster: 'reverb',
+                key: import.meta.env.VITE_REVERB_APP_KEY,
+                wsHost: import.meta.env.VITE_REVERB_HOST || 'localhost',
+                wsPort: import.meta.env.VITE_REVERB_PORT || 8080,
+                wssPort: import.meta.env.VITE_REVERB_PORT || 8080,
+                forceTLS:
+                    (import.meta.env.VITE_REVERB_SCHEME || 'http') === 'https',
+                enabledTransports: ['ws', 'wss'],
+            });
+        },
+    );
 }

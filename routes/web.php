@@ -1,16 +1,55 @@
 <?php
 
+use App\Http\Controllers\AcademicTranscriptController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\AdmissionOfferController;
+use App\Http\Controllers\AlumniProfileController;
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\ApplicationRequirementController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\BuildingController;
+use App\Http\Controllers\CampusController;
+use App\Http\Controllers\CareerPlacementController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseOfferingController;
+use App\Http\Controllers\CoursePrerequisiteController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DegreeAuditController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\DormitoryController;
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\FacultyStaffController;
+use App\Http\Controllers\FeeController;
+use App\Http\Controllers\FinalTermGradeController;
+use App\Http\Controllers\FinancialAccountController;
+use App\Http\Controllers\FundSourceController;
+use App\Http\Controllers\GradebookComponentController;
+use App\Http\Controllers\GradeController;
+use App\Http\Controllers\GraduationApplicationController;
+use App\Http\Controllers\HostelController;
 use App\Http\Controllers\LectureController;
+use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\LibraryFineController;
+use App\Http\Controllers\LmsCourseController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\ProgramRequirementController;
+use App\Http\Controllers\ProspectController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleManagementController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\RoomInventoryController;
+use App\Http\Controllers\ScholarshipAwardController;
+use App\Http\Controllers\SessionLogController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentRegistrationController;
+use App\Http\Controllers\StudentStatusLogController;
 use App\Http\Controllers\SystemConfigController;
 use App\Http\Controllers\ThreatAlertController;
+use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\WaitlistController;
 use App\Models\User;
 use App\Notifications\UnlockRequestNotification;
 use Illuminate\Http\Request;
@@ -78,6 +117,75 @@ Route::middleware(['auth', 'verified', 'check.lock', 'track.activity', 'role:adm
         Route::resource('exams', ExamController::class);
         Route::post('exams/{exam}/toggle-lock', [ExamController::class, 'toggleLock'])->name('exams.toggle-lock');
         Route::resource('students', StudentController::class);
+
+        // Academic
+        Route::resource('programs', ProgramController::class);
+        Route::resource('offerings', CourseOfferingController::class);
+        Route::resource('enrollments', EnrollmentController::class);
+        Route::resource('gradebook-components', GradebookComponentController::class);
+        Route::resource('grades', GradeController::class);
+        Route::resource('final-term-grades', FinalTermGradeController::class);
+
+        // Timetables
+        Route::resource('timetables', TimetableController::class);
+
+        // Faculty
+        Route::resource('faculty', FacultyStaffController::class);
+
+        // Admissions
+        Route::resource('admissions.prospects', ProspectController::class);
+        Route::resource('admissions.applications', ApplicationController::class);
+        Route::resource('admissions.offers', AdmissionOfferController::class);
+        Route::resource('admissions.application-requirements', ApplicationRequirementController::class);
+
+        // Finance
+        Route::resource('fees', FeeController::class);
+        Route::resource('financial-accounts', FinancialAccountController::class);
+        Route::resource('payments', PaymentController::class);
+        Route::resource('scholarship-awards', ScholarshipAwardController::class);
+        Route::resource('fund-sources', FundSourceController::class);
+
+        // Library
+        Route::resource('library', LibraryController::class);
+        Route::resource('library-fines', LibraryFineController::class);
+
+        // LMS
+        Route::resource('lms-courses', LmsCourseController::class);
+
+        // Housing
+        Route::resource('dormitories', DormitoryController::class);
+        Route::resource('hostels', HostelController::class);
+
+        // Alumni
+        Route::resource('alumni', AlumniProfileController::class);
+        Route::resource('career-placements', CareerPlacementController::class);
+        Route::resource('donations', DonationController::class);
+
+        // Campus
+        Route::resource('campuses', CampusController::class);
+        Route::resource('buildings', BuildingController::class);
+        Route::resource('rooms', RoomController::class);
+        Route::resource('room-inventory', RoomInventoryController::class);
+
+        // Academic
+        Route::resource('academics.transcripts', AcademicTranscriptController::class);
+        Route::resource('academics.degree-audits', DegreeAuditController::class);
+        Route::resource('academics.graduation-applications', GraduationApplicationController::class);
+
+        // Curriculum
+        Route::resource('curriculum.program-requirements', ProgramRequirementController::class);
+        Route::resource('curriculum.course-prerequisites', CoursePrerequisiteController::class);
+
+        // Attendance
+        Route::resource('attendance', AttendanceController::class);
+
+        // Student info
+        Route::resource('student-registrations', StudentRegistrationController::class);
+        Route::resource('student-status-logs', StudentStatusLogController::class);
+        Route::resource('waitlists', WaitlistController::class);
+
+        // Session logs
+        Route::resource('session-logs', SessionLogController::class)->only(['index', 'show']);
     });
 
 require __DIR__.'/settings.php';

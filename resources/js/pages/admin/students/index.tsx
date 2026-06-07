@@ -1,7 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, LayoutGrid, Table2 } from 'lucide-react';
+import { useState } from 'react';
 import DataTable from '@/components/shared/DataTable';
+import { StudentDashboard } from '@/components/students/student-dashboard';
 import type { Student, Department } from '@/types';
 
 interface Props {
@@ -9,6 +11,12 @@ interface Props {
     filters: Record<string, string | undefined>;
     departments: Department[];
     programs: string[];
+    stats?: {
+        total: number;
+        active: number;
+        by_department: { name: string; count: number }[];
+        by_year: { year: number; count: number }[];
+    };
 }
 
 export default function StudentsIndex({
@@ -16,7 +24,10 @@ export default function StudentsIndex({
     filters,
     departments,
     programs,
+    stats,
 }: Props) {
+    const [view, setView] = useState<'table' | 'dashboard'>('table');
+
     const columns = [
         {
             key: 'registration_number',
@@ -30,10 +41,7 @@ export default function StudentsIndex({
                 </Link>
             ),
         },
-        {
-            key: 'name',
-            label: 'Name',
-        },
+        { key: 'name', label: 'Name' },
         {
             key: 'department',
             label: 'Department',
@@ -42,14 +50,8 @@ export default function StudentsIndex({
                     <span className="text-muted-foreground">N/A</span>
                 ),
         },
-        {
-            key: 'program',
-            label: 'Program',
-        },
-        {
-            key: 'year_of_study',
-            label: 'Year',
-        },
+        { key: 'program', label: 'Program' },
+        { key: 'year_of_study', label: 'Year' },
         {
             key: 'is_active',
             label: 'Status',
@@ -120,47 +122,56 @@ export default function StudentsIndex({
                     </option>
                 ))}
             </select>
-            <select
-                name="active"
-                defaultValue={filters.active ?? ''}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm shadow-sm"
-                onChange={(e) => {
-                    const url = new URL(window.location.href);
-                    if (e.target.value !== '')
-                        url.searchParams.set('active', e.target.value);
-                    else url.searchParams.delete('active');
-                    url.searchParams.set('page', '1');
-                    window.location.href = url.toString();
-                }}
-            >
-                <option value="">All Status</option>
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
-            </select>
         </>
     );
 
     return (
         <>
             <Head title="Students" />
-
-            <div className="space-y-6 p-6">
+            <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Students</h1>
-                    <Button asChild>
-                        <Link href="/admin/students/create">
-                            <Plus className="mr-2 h-4 w-4" /> Create Student
-                        </Link>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center rounded-lg border p-0.5">
+                            <Button
+                                variant={
+                                    view === 'dashboard' ? 'secondary' : 'ghost'
+                                }
+                                size="sm"
+                                onClick={() => setView('dashboard')}
+                                className="h-7 px-2"
+                            >
+                                <LayoutGrid className="size-4" />
+                            </Button>
+                            <Button
+                                variant={
+                                    view === 'table' ? 'secondary' : 'ghost'
+                                }
+                                size="sm"
+                                onClick={() => setView('table')}
+                                className="h-7 px-2"
+                            >
+                                <Table2 className="size-4" />
+                            </Button>
+                        </div>
+                        <Button asChild>
+                            <Link href="/admin/students/create">
+                                <Plus className="mr-2 h-4 w-4" /> Create Student
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
-
-                <DataTable
-                    data={students}
-                    columns={columns}
-                    filters={filters}
-                    searchPlaceholder="Search by name, reg number, or email..."
-                    filterFields={filterFields}
-                />
+                {view === 'dashboard' && stats ? (
+                    <StudentDashboard stats={stats} />
+                ) : (
+                    <DataTable
+                        data={students}
+                        columns={columns}
+                        filters={filters}
+                        searchPlaceholder="Search by name, reg number, or email..."
+                        filterFields={filterFields}
+                    />
+                )}
             </div>
         </>
     );
