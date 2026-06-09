@@ -1,6 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
 import InputError from '@/components/input-error';
-import PasskeyVerify from '@/components/passkey-verify';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -11,18 +10,23 @@ import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
+import AuthCardLayout from '@/layouts/auth/auth-card-layout';
+import React from 'react';
 
 type Props = {
     status?: string;
     canResetPassword: boolean;
+    canRegister: boolean;
 };
 
-export default function Login({ status, canResetPassword }: Props) {
+export default function Login({
+    status,
+    canResetPassword,
+    canRegister,
+}: Props) {
     return (
         <>
             <Head title="Log in" />
-
-            <PasskeyVerify />
 
             <Form
                 {...store.form()}
@@ -56,7 +60,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                             className="ml-auto text-sm"
                                             tabIndex={5}
                                         >
-                                            Forgot your password?
+                                            Forgot password?
                                         </TextLink>
                                     )}
                                 </div>
@@ -92,12 +96,14 @@ export default function Login({ status, canResetPassword }: Props) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                Sign up
-                            </TextLink>
-                        </div>
+                        {canRegister && (
+                            <div className="text-center text-sm text-muted-foreground">
+                                Don't have an account?{' '}
+                                <TextLink href={register()} tabIndex={5}>
+                                    Sign up
+                                </TextLink>
+                            </div>
+                        )}
                     </>
                 )}
             </Form>
@@ -111,7 +117,12 @@ export default function Login({ status, canResetPassword }: Props) {
     );
 }
 
-Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
-};
+
+Login.layout = (page: React.ReactNode) => (
+    <AuthCardLayout
+    title="Log in to your account"
+    description="Enter your email and password below to log in"
+    >
+        {page}
+    </AuthCardLayout>
+);

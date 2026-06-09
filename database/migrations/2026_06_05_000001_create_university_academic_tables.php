@@ -202,7 +202,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
             $table->string('fee_type', 100);
             $table->decimal('amount', 10, 2);
-            $table->date('due_date');
+            $table->date('due_date')->nullable();
             $table->enum('status', ['pending', 'paid', 'overdue', 'waived']);
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
@@ -234,7 +234,7 @@ return new class extends Migration
             $table->foreignId('financial_account_id')->constrained('financial_accounts')->cascadeOnDelete();
             $table->string('invoice_number', 30)->unique('uq_tuition_inv_number');
             $table->decimal('total_amount', 10, 2);
-            $table->date('due_date');
+            $table->date('due_date')->nullable();
             $table->enum('status', ['pending', 'paid', 'overdue', 'cancelled']);
             $table->timestamps();
         });
@@ -295,7 +295,7 @@ return new class extends Migration
             $table->foreignId('library_book_id')->constrained('library_books')->cascadeOnDelete();
             $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
             $table->timestamp('borrowed_at')->useCurrent();
-            $table->timestamp('due_at');
+            $table->date('due_date')->nullable();
             $table->timestamp('returned_at')->nullable();
             $table->enum('status', ['active', 'returned', 'overdue']);
             $table->timestamps();

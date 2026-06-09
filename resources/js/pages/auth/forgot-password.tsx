@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
-
+import AuthCardLayout from '@/layouts/auth/auth-card-layout';
 export default function ForgotPassword({ status }: { status?: string }) {
     return (
         <>
@@ -62,8 +62,11 @@ export default function ForgotPassword({ status }: { status?: string }) {
         </>
     );
 }
-
-ForgotPassword.layout = {
-    title: 'Forgot password',
-    description: 'Enter your email to receive a password reset link',
-};
+ForgotPassword.layout  = (page: React.ReactNode) => (
+    <AuthCardLayout
+    title="Forgot password"
+    description="Enter your email to receive a password reset link"
+    >
+        {page}
+    </AuthCardLayout>
+);

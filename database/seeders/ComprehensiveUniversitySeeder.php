@@ -369,7 +369,7 @@ class ComprehensiveUniversitySeeder extends Seeder
                 'library_book_id' => $books[$i]->id,
                 'student_id' => $student->id,
                 'borrowed_at' => Carbon::parse('2025-10-01')->addDays($i * 5),
-                'due_at' => Carbon::parse('2025-10-29')->addDays($i * 5),
+                'due_date' => Carbon::parse('2025-10-29')->addDays($i * 5),
                 'returned_at' => $i === 0 ? Carbon::parse('2025-10-25') : null,
                 'status' => $i === 0 ? 'returned' : 'active',
             ]);

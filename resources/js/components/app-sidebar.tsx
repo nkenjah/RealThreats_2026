@@ -97,120 +97,120 @@ const navSections: NavSection[] = [
             },
         ],
     },
-    {
-        title: 'Curriculum',
-        items: [
-            {
-                title: 'Program Requirements',
-                href: '/admin/curriculum/program-requirements',
-                icon: FileText,
-            },
-            {
-                title: 'Course Prerequisites',
-                href: '/admin/curriculum/course-prerequisites',
-                icon: BookMarked,
-            },
-        ],
-    },
-    {
-        title: 'Academic Records',
-        items: [
-            {
-                title: 'Transcripts',
-                href: '/admin/academics/transcripts',
-                icon: FileText,
-            },
-            {
-                title: 'Degree Audits',
-                href: '/admin/academics/degree-audits',
-                icon: FileText,
-            },
-        ],
-    },
-    {
-        title: 'Admissions',
-        items: [
-            {
-                title: 'Prospects',
-                href: '/admin/admissions/prospects',
-                icon: Users,
-            },
-            {
-                title: 'Applications',
-                href: '/admin/admissions/applications',
-                icon: FileText,
-            },
-            {
-                title: 'Offers',
-                href: '/admin/admissions/offers',
-                icon: FileText,
-            },
-        ],
-    },
-    {
-        title: 'Finance',
-        items: [
-            { title: 'Fees', href: '/admin/fees', icon: Landmark },
-            {
-                title: 'Financial Accounts',
-                href: '/admin/financial-accounts',
-                icon: Landmark,
-            },
-            { title: 'Payments', href: '/admin/payments', icon: Landmark },
-            {
-                title: 'Scholarships',
-                href: '/admin/scholarship-awards',
-                icon: Landmark,
-            },
-            {
-                title: 'Fund Sources',
-                href: '/admin/fund-sources',
-                icon: Landmark,
-            },
-        ],
-    },
-    {
-        title: 'Facilities',
-        items: [
-            { title: 'Campuses', href: '/admin/campuses', icon: Building2 },
-            { title: 'Buildings', href: '/admin/buildings', icon: Building2 },
-            { title: 'Rooms', href: '/admin/rooms', icon: Building2 },
-        ],
-    },
-    {
-        title: 'Library',
-        items: [
-            { title: 'Library Items', href: '/admin/library', icon: Library },
-            {
-                title: 'Library Fines',
-                href: '/admin/library-fines',
-                icon: Library,
-            },
-        ],
-    },
-    {
-        title: 'LMS',
-        items: [{ title: 'Courses', href: '/admin/lms-courses', icon: School }],
-    },
-    {
-        title: 'Housing',
-        items: [
-            { title: 'Dormitories', href: '/admin/dormitories', icon: Home },
-            { title: 'Hostels', href: '/admin/hostels', icon: Home },
-        ],
-    },
-    {
-        title: 'Alumni',
-        items: [
-            { title: 'Profiles', href: '/admin/alumni', icon: Users },
-            {
-                title: 'Career Placements',
-                href: '/admin/career-placements',
-                icon: Users,
-            },
-            { title: 'Donations', href: '/admin/donations', icon: Landmark },
-        ],
-    },
+    // {
+    //     title: 'Curriculum',
+    //     items: [
+    //         {
+    //             title: 'Program Requirements',
+    //             href: '/admin/curriculum/program-requirements',
+    //             icon: FileText,
+    //         },
+    //         {
+    //             title: 'Course Prerequisites',
+    //             href: '/admin/curriculum/course-prerequisites',
+    //             icon: BookMarked,
+    //         },
+    //     ],
+    // },
+    // {
+    //     title: 'Academic Records',
+    //     items: [
+    //         {
+    //             title: 'Transcripts',
+    //             href: '/admin/academics/transcripts',
+    //             icon: FileText,
+    //         },
+    //         {
+    //             title: 'Degree Audits',
+    //             href: '/admin/academics/degree-audits',
+    //             icon: FileText,
+    //         },
+    //     ],
+    // },
+    // {
+    //     title: 'Admissions',
+    //     items: [
+    //         {
+    //             title: 'Prospects',
+    //             href: '/admin/admissions/prospects',
+    //             icon: Users,
+    //         },
+    //         {
+    //             title: 'Applications',
+    //             href: '/admin/admissions/applications',
+    //             icon: FileText,
+    //         },
+    //         {
+    //             title: 'Offers',
+    //             href: '/admin/admissions/offers',
+    //             icon: FileText,
+    //         },
+    //     ],
+    // },
+    // {
+    //     title: 'Finance',
+    //     items: [
+    //         { title: 'Fees', href: '/admin/fees', icon: Landmark },
+    //         {
+    //             title: 'Financial Accounts',
+    //             href: '/admin/financial-accounts',
+    //             icon: Landmark,
+    //         },
+    //         { title: 'Payments', href: '/admin/payments', icon: Landmark },
+    //         {
+    //             title: 'Scholarships',
+    //             href: '/admin/scholarship-awards',
+    //             icon: Landmark,
+    //         },
+    //         {
+    //             title: 'Fund Sources',
+    //             href: '/admin/fund-sources',
+    //             icon: Landmark,
+    //         },
+    //     ],
+    // },
+    // {
+    //     title: 'Facilities',
+    //     items: [
+    //         { title: 'Campuses', href: '/admin/campuses', icon: Building2 },
+    //         { title: 'Buildings', href: '/admin/buildings', icon: Building2 },
+    //         { title: 'Rooms', href: '/admin/rooms', icon: Building2 },
+    //     ],
+    // },
+    // {
+    //     title: 'Library',
+    //     items: [
+    //         { title: 'Library Items', href: '/admin/library', icon: Library },
+    //         {
+    //             title: 'Library Fines',
+    //             href: '/admin/library-fines',
+    //             icon: Library,
+    //         },
+    //     ],
+    // },
+    // {
+    //     title: 'LMS',
+    //     items: [{ title: 'Courses', href: '/admin/lms-courses', icon: School }],
+    // },
+    // {
+    //     title: 'Housing',
+    //     items: [
+    //         { title: 'Dormitories', href: '/admin/dormitories', icon: Home },
+    //         { title: 'Hostels', href: '/admin/hostels', icon: Home },
+    //     ],
+    // },
+    // {
+    //     title: 'Alumni',
+    //     items: [
+    //         { title: 'Profiles', href: '/admin/alumni', icon: Users },
+    //         {
+    //             title: 'Career Placements',
+    //             href: '/admin/career-placements',
+    //             icon: Users,
+    //         },
+    //         { title: 'Donations', href: '/admin/donations', icon: Landmark },
+    //     ],
+    // },
     {
         title: 'System',
         items: [

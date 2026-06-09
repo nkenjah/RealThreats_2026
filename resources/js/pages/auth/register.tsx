@@ -8,12 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
+import AuthCardLayout from '@/layouts/auth/auth-card-layout';
 
-type Props = {
-    passwordRules: string;
-};
-
-export default function Register({ passwordRules }: Props) {
+export default function Register() {
     return (
         <>
             <Head title="Register" />
@@ -67,7 +64,6 @@ export default function Register({ passwordRules }: Props) {
                                     autoComplete="new-password"
                                     name="password"
                                     placeholder="Password"
-                                    passwordrules={passwordRules}
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -83,7 +79,6 @@ export default function Register({ passwordRules }: Props) {
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder="Confirm password"
-                                    passwordrules={passwordRules}
                                 />
                                 <InputError
                                     message={errors.password_confirmation}
@@ -114,7 +109,11 @@ export default function Register({ passwordRules }: Props) {
     );
 }
 
-Register.layout = {
-    title: 'Create an account',
-    description: 'Enter your details below to create your account',
-};
+Register.layout = (page: React.ReactNode) => (
+    <AuthCardLayout
+    title="Create an account"
+    description="Enter your details below to create your account"
+    >
+        {page}
+    </AuthCardLayout>
+);
