@@ -9,8 +9,8 @@ export default function LiveThreatFeed() {
 
         const channel = window.Echo.channel('threats');
 
-        channel.listen('ThreatDetectedEvent', (e: ThreatEvent) => {
-            setThreats((prev) => [e, ...prev].slice(0, 20));
+        channel.listen('ThreatDetectedEvent', (e: unknown) => {
+            setThreats((prev) => [e as ThreatEvent, ...prev].slice(0, 20));
         });
 
         channel.listen('ThreatMitigatedEvent', (e: any) => {

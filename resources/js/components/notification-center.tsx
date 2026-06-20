@@ -84,7 +84,12 @@ export function NotificationCenter() {
                             <div className="flex-1 space-y-1">
                                 <div className="flex items-center justify-between">
                                     <p className="text-sm font-medium">
-                                        {notif.data?.title ?? 'Notification'}
+                                        {notif.data?.title ??
+                                            notif.data?.type?.replace(
+                                                /_/g,
+                                                ' ',
+                                            ) ??
+                                            'Notification'}
                                     </p>
                                     {!notif.read_at && (
                                         <span className="size-2 shrink-0 rounded-full bg-primary" />

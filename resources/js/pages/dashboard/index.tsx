@@ -1,5 +1,14 @@
 import { Head } from '@inertiajs/react';
-import { Activity, AlertTriangle, Users, ShieldAlert } from 'lucide-react';
+import {
+    Activity,
+    AlertTriangle,
+    Users,
+    ShieldAlert,
+    GraduationCap,
+    BookOpen,
+    TrendingUp,
+    DollarSign,
+} from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import RiskLeaderboard from '@/components/dashboard/RiskLeaderboard';
 import AlertTrendChart from '@/components/dashboard/AlertTrendChart';
@@ -7,11 +16,19 @@ import SeverityDonutChart from '@/components/dashboard/SeverityDonutChart';
 import LiveThreatFeed from '@/components/dashboard/LiveThreatFeed';
 import type { DashboardStats, User } from '@/types';
 
+interface AcademicStats {
+    total_students: number;
+    active_enrollments: number;
+    avg_gpa: number;
+    collection_rate: number;
+}
+
 interface DashboardProps {
     stats: DashboardStats;
     riskLeaderboard: User[];
     alertTrend: Array<{ date: string; count: number }>;
     severityDistribution: Record<string, number>;
+    academicStats: AcademicStats;
 }
 
 export default function DashboardIndex({
@@ -19,6 +36,7 @@ export default function DashboardIndex({
     riskLeaderboard,
     alertTrend,
     severityDistribution,
+    academicStats,
 }: DashboardProps) {
     return (
         <>
@@ -59,6 +77,35 @@ export default function DashboardIndex({
                                 ? 'destructive'
                                 : 'default'
                         }
+                    />
+                </div>
+
+                <h2 className="text-xl font-bold">Academic Overview</h2>
+
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <StatsCard
+                        title="Total Students"
+                        value={academicStats.total_students}
+                        icon={GraduationCap}
+                        variant="default"
+                    />
+                    <StatsCard
+                        title="Active Enrollments"
+                        value={academicStats.active_enrollments}
+                        icon={BookOpen}
+                        variant="default"
+                    />
+                    <StatsCard
+                        title="Average GPA"
+                        value={academicStats.avg_gpa.toFixed(2)}
+                        icon={TrendingUp}
+                        variant="default"
+                    />
+                    <StatsCard
+                        title="Revenue Collected"
+                        value={`TZS ${(academicStats.collection_rate / 1_000_000).toFixed(1)}M`}
+                        icon={DollarSign}
+                        variant="default"
                     />
                 </div>
 

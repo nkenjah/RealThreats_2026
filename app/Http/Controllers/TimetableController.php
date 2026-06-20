@@ -48,6 +48,51 @@ class TimetableController extends Controller
             'lecturer_id' => ['nullable', 'exists:faculty_staff,id'],
         ]);
 
+        // Clash detection: check venue double-booking
+        $venueClash = Timetable::where('venue', $validated['venue'])
+            ->where('day_of_week', $validated['day_of_week'])
+            ->where('semester', $validated['semester'])
+            ->where(function ($q) use ($validated) {
+                $q->whereBetween('start_time', [$validated['start_time'], $validated['end_time']])
+                    ->orWhereBetween('end_time', [$validated['start_time'], $validated['end_time']])
+                    ->orWhere(function ($q2) use ($validated) {
+                        $q2->where('start_time', '<=', $validated['start_time'])
+                            ->where('end_time', '>=', $validated['end_time']);
+                    });
+            })
+            ->first();
+
+        if ($venueClash) {
+            return back()->withErrors([
+                'venue' => "Room '{$validated['venue']}' is already booked on {$validated['day_of_week']} from {$venueClash->start_time} to {$venueClash->end_time}.",
+            ])->withInput();
+        }
+
+        // Clash detection: check lecturer double-booking
+        if (! empty($validated['lecturer_id'])) {
+            $lecturerClash = Timetable::where('lecturer_id', $validated['lecturer_id'])
+                ->where('day_of_week', $validated['day_of_week'])
+                ->where('semester', $validated['semester'])
+                ->where(function ($q) use ($validated) {
+                    $q->whereBetween('start_time', [$validated['start_time'], $validated['end_time']])
+                        ->orWhereBetween('end_time', [$validated['start_time'], $validated['end_time']])
+                        ->orWhere(function ($q2) use ($validated) {
+                            $q2->where('start_time', '<=', $validated['start_time'])
+                                ->where('end_time', '>=', $validated['end_time']);
+                        });
+                })
+                ->with('lecturer')
+                ->first();
+
+            if ($lecturerClash) {
+                $lecturerName = $lecturerClash->lecturer?->name ?? 'Selected lecturer';
+
+                return back()->withErrors([
+                    'lecturer_id' => "{$lecturerName} is already scheduled on {$validated['day_of_week']} from {$lecturerClash->start_time} to {$lecturerClash->end_time}.",
+                ])->withInput();
+            }
+        }
+
         Timetable::create($validated);
 
         return redirect()->route('admin.academics.timetables.index')->with('success', 'Timetable entry created.');
@@ -80,6 +125,27 @@ class TimetableController extends Controller
             'semester' => ['required', 'string', 'max:20'],
             'lecturer_id' => ['nullable', 'exists:faculty_staff,id'],
         ]);
+
+        // Clash detection on update (exclude self)
+        $venueClash = Timetable::where('venue', $validated['venue'])
+            ->where('day_of_week', $validated['day_of_week'])
+            ->where('semester', $validated['semester'])
+            ->where('id', '!=', $timetable->id)
+            ->where(function ($q) use ($validated) {
+                $q->whereBetween('start_time', [$validated['start_time'], $validated['end_time']])
+                    ->orWhereBetween('end_time', [$validated['start_time'], $validated['end_time']])
+                    ->orWhere(function ($q2) use ($validated) {
+                        $q2->where('start_time', '<=', $validated['start_time'])
+                            ->where('end_time', '>=', $validated['end_time']);
+                    });
+            })
+            ->first();
+
+        if ($venueClash) {
+            return back()->withErrors([
+                'venue' => "Room '{$validated['venue']}' is already booked on {$validated['day_of_week']} from {$venueClash->start_time} to {$venueClash->end_time}.",
+            ])->withInput();
+        }
 
         $timetable->update($validated);
 

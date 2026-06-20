@@ -1,4 +1,4 @@
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
@@ -64,6 +64,27 @@ if (typeof window !== 'undefined' && import.meta.env.VITE_REVERB_APP_KEY) {
                     (import.meta.env.VITE_REVERB_SCHEME || 'http') === 'https',
                 enabledTransports: ['ws', 'wss'],
             });
+
+            const adminChannel = window.Echo.channel('admin-alerts');
+            adminChannel.listen('.ThreatDetectedEvent', () => router.reload());
+            adminChannel.listen('.AccountLockedEvent', () => router.reload());
+            adminChannel.listen('.SuspiciousLoginEvent', () => router.reload());
+            adminChannel.listen('.GradeSubmittedEvent', () => router.reload());
+            adminChannel.listen('.GradeApprovedEvent', () => router.reload());
+            adminChannel.listen('.FeePaymentReceivedEvent', () =>
+                router.reload(),
+            );
+            adminChannel.listen('.SemesterStatusChangedEvent', () =>
+                router.reload(),
+            );
+
+            const threatsChannel = window.Echo.channel('threats');
+            threatsChannel.listen('.ThreatDetectedEvent', () =>
+                router.reload(),
+            );
+            threatsChannel.listen('.ThreatMitigatedEvent', () =>
+                router.reload(),
+            );
         },
     );
 }

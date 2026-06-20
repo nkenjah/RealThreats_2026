@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Grade;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+
 use App\Models\AcademicTranscript;
 use App\Models\Program;
 use App\Models\Student;
@@ -87,5 +91,45 @@ class AcademicTranscriptController extends Controller
         $academicTranscript->delete();
 
         return redirect()->route('admin.academic-records.transcripts.index')->with('success', 'Academic transcript deleted.');
+    }
+
+    public function download(AcademicTranscript $academicTranscript): SymfonyResponse
+    {
+        $academicTranscript->load(['student.department', 'program']);
+        $student = $academicTranscript->student;
+        $grades = Grade::where('student_id', $student->id)
+            ->with('courseOffering.course')
+            ->where('status', 'approved')
+            ->orderBy('academic_year')
+            ->orderBy('semester')
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.academic-transcript', [
+            'transcript' => $academicTranscript,
+            'student' => $student,
+            'grades' => $grades,
+            'verification_url' => $academicTranscript->getVerificationUrl(),
+        ]);
+
+        return $pdf->download('transcript-' . str_replace('/', '-', $student->registration_number) . '.pdf');
+    }
+
+    public function verify(string $hash): Response
+    {
+        $transcript = AcademicTranscript::with(['student', 'program'])
+            ->where('verification_hash', $hash)
+            ->firstOrFail();
+
+        return Inertia::render('verify/transcript', [
+            'valid' => true,
+            'transcript' => [
+                'student_name' => $transcript->student->name,
+                'registration_number' => $transcript->student->registration_number,
+                'program' => $transcript->program?->name ?? $transcript->student->program,
+                'cumulative_gpa' => $transcript->cumulative_gpa,
+                'total_credits' => $transcript->total_credits_earned,
+                'generated_at' => $transcript->generated_at,
+            ],
+        ]);
     }
 }

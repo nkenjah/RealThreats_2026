@@ -1,25 +1,30 @@
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, LayoutGrid, Table2 } from 'lucide-react';
+import { useState } from 'react';
 import DataTable from '@/components/shared/DataTable';
-
-interface Attendance {
-    id: number;
-    student_id: number;
-    lecture_id: number;
-    status: string;
-    lecture_date: string;
-    notes: string | null;
-    student?: { id: number; name: string; registration_number: string };
-    lecture?: { id: number; topic: string };
-}
+import { AttendanceAnalytics } from '@/components/attendance/attendance-analytics';
+import type { Attendance } from '@/types';
 
 interface Props {
-    attendance: any;
+    attendances: any;
     filters: Record<string, string | undefined>;
+    stats?: {
+        present: number;
+        absent: number;
+        late: number;
+        excused: number;
+        total: number;
+    };
 }
 
-export default function AttendanceIndex({ attendance, filters }: Props) {
+export default function AttendanceIndex({
+    attendances,
+    filters,
+    stats,
+}: Props) {
+    const [view, setView] = useState<'table' | 'dashboard'>('table');
+
     const columns = [
         {
             key: 'student',
@@ -85,19 +90,54 @@ export default function AttendanceIndex({ attendance, filters }: Props) {
             <div className="space-y-6 p-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Attendance</h1>
-                    <Button asChild>
-                        <Link href="/admin/attendance/create">
-                            <Plus className="mr-2 h-4 w-4" /> Create Attendance
-                        </Link>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center rounded-lg border p-0.5">
+                            <Button
+                                variant={
+                                    view === 'dashboard' ? 'secondary' : 'ghost'
+                                }
+                                size="sm"
+                                onClick={() => setView('dashboard')}
+                                className="h-7 px-2"
+                            >
+                                <LayoutGrid className="size-4" />
+                            </Button>
+                            <Button
+                                variant={
+                                    view === 'table' ? 'secondary' : 'ghost'
+                                }
+                                size="sm"
+                                onClick={() => setView('table')}
+                                className="h-7 px-2"
+                            >
+                                <Table2 className="size-4" />
+                            </Button>
+                        </div>
+                        <Button asChild>
+                            <Link href="/admin/attendance/create">
+                                <Plus className="mr-2 h-4 w-4" /> Create
+                                Attendance
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
-                <DataTable
-                    data={attendance}
-                    columns={columns}
-                    filters={filters}
-                    searchPlaceholder="Search by student name or notes..."
-                />
+                {view === 'dashboard' && stats ? (
+                    <AttendanceAnalytics
+                        present={stats.present}
+                        absent={stats.absent}
+                        late={stats.late}
+                        excused={stats.excused}
+                        total={stats.total}
+                    />
+                ) : (
+                    <DataTable
+                        data={attendances}
+                        columns={columns}
+                        filters={filters}
+                        searchPlaceholder="Search by student name or notes..."
+                    />
+                )}
             </div>
         </>
     );

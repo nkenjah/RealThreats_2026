@@ -14,16 +14,36 @@ class PaymentController extends Controller
     public function index(Request $request): Response
     {
         $payments = Payment::with('financialAccount.student')
-            ->when($request->search, fn ($query, $search) => $query->where('reference_number', 'like', "%{$search}%"))
-            ->when($request->status, fn ($query, $status) => $query->where('status', $status))
+            ->when($request->search, fn ($query, $search) => $query->whereHas('financialAccount.student', fn ($q) => $q->where('name', 'like', "%{$search}%")))
             ->when($request->payment_method, fn ($query, $method) => $query->where('payment_method', $method))
+            ->when($request->status, fn ($query, $status) => $query->where('status', $status))
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
+        $stats = [
+            'total_collected' => Payment::where('status', 'completed')->sum('amount'),
+            'pending_payments' => Payment::where('status', 'pending')->count(),
+            'pending_amount' => Payment::where('status', 'pending')->sum('amount'),
+            'total_transactions' => Payment::count(),
+            'by_method' => Payment::selectRaw('payment_method, count(*) as count, sum(amount) as total')
+                ->where('status', 'completed')
+                ->groupBy('payment_method')
+                ->get()
+                ->toArray(),
+            'monthly_collections' => Payment::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, sum(amount) as total")
+                ->where('status', 'completed')
+                ->groupBy('month')
+                ->orderBy('month')
+                ->limit(12)
+                ->get()
+                ->toArray(),
+        ];
+
         return Inertia::render('admin/finances/payments/index', [
             'payments' => $payments,
-            'filters' => $request->only(['search', 'status', 'payment_method']),
+            'filters' => $request->only(['search', 'payment_method', 'status']),
+            'stats' => $stats,
         ]);
     }
 
@@ -41,14 +61,16 @@ class PaymentController extends Controller
             'amount' => ['required', 'numeric', 'min:0'],
             'payment_method' => ['required', 'string', 'max:50'],
             'payment_date' => ['required', 'date'],
-            'reference_number' => ['nullable', 'string', 'max:100', 'unique:payments,reference_number'],
+            'reference_number' => ['nullable', 'string', 'max:100'],
             'status' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],
         ]);
 
-        Payment::create($validated);
+        $payment = Payment::create($validated);
 
-        return redirect()->route('admin.finances.payments.index')->with('success', 'Payment created.');
+        broadcast(new FeePaymentReceivedEvent($payment));
+
+        return redirect()->route('admin.payments.index')->with('success', 'Payment created.');
     }
 
     public function show(Payment $payment): Response
@@ -73,7 +95,7 @@ class PaymentController extends Controller
             'amount' => ['required', 'numeric', 'min:0'],
             'payment_method' => ['required', 'string', 'max:50'],
             'payment_date' => ['required', 'date'],
-            'reference_number' => ['nullable', 'string', 'max:100', 'unique:payments,reference_number,'.$payment->id],
+            'reference_number' => ['nullable', 'string', 'max:100'],
             'status' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],
         ]);
@@ -87,6 +109,6 @@ class PaymentController extends Controller
     {
         $payment->delete();
 
-        return redirect()->route('admin.finances.payments.index')->with('success', 'Payment deleted.');
+        return redirect()->route('admin.payments.index')->with('success', 'Payment deleted.');
     }
 }

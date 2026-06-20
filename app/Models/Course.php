@@ -24,4 +24,14 @@ class Course extends Model
     {
         return $this->hasMany(Exam::class);
     }
+
+    public function prerequisites(): HasMany
+    {
+        return $this->hasMany(CoursePrerequisite::class, 'course_id');
+    }
+
+    public function isPrerequisiteFor(): HasMany
+    {
+        return $this->hasMany(CoursePrerequisite::class, 'prerequisite_course_id');
+    }
 }

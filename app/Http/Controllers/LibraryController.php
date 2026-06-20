@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\LibraryBook;
+use App\Models\LibraryBorrowing;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,9 +21,25 @@ class LibraryController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $stats = [
+            'total_books' => LibraryBook::count(),
+            'available' => LibraryBook::sum('available_copies'),
+            'borrowed' => LibraryBorrowing::whereNull('returned_at')->count(),
+            'overdue' => LibraryBorrowing::whereNull('returned_at')
+                ->where('due_at', '<', now())
+                ->count(),
+            'by_category' => LibraryBook::select('category', DB::raw('count(*) as count'))
+                ->whereNotNull('category')
+                ->groupBy('category')
+                ->orderByDesc('count')
+                ->get()
+                ->toArray(),
+        ];
+
         return Inertia::render('admin/library/index', [
             'books' => $books,
             'filters' => $request->only(['search', 'category']),
+            'stats' => $stats,
         ]);
     }
 

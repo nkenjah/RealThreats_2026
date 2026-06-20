@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\Student;
+use App\Services\GradingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,6 +13,10 @@ use Inertia\Response;
 
 class EnrollmentController extends Controller
 {
+    public function __construct(
+        private readonly GradingService $gradingService,
+    ) {}
+
     public function index(Request $request): Response
     {
         $enrollments = Enrollment::with(['student', 'courseOffering.course'])
@@ -44,6 +49,26 @@ class EnrollmentController extends Controller
             'status' => ['nullable', 'string', 'max:50'],
             'grade' => ['nullable', 'string', 'max:10'],
         ]);
+
+        $student = Student::findOrFail($validated['student_id']);
+        $courseOffering = CourseOffering::with('course')->findOrFail($validated['course_offering_id']);
+
+        // Check for duplicate enrollment
+        $existing = Enrollment::where('student_id', $student->id)
+            ->where('course_offering_id', $courseOffering->id)
+            ->first();
+
+        if ($existing) {
+            return back()->withErrors(['course_offering_id' => 'Student is already enrolled in this course offering.'])->withInput();
+        }
+
+        // Check prerequisites
+        $failedPrereqs = $this->gradingService->validatePrerequisites($student, $courseOffering->course);
+        if (! empty($failedPrereqs)) {
+            return back()->withErrors([
+                'course_offering_id' => 'Prerequisite not met: '.implode(', ', $failedPrereqs),
+            ])->withInput();
+        }
 
         Enrollment::create($validated);
 

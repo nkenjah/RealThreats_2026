@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\Student;
+use App\Services\FeeBlockingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,6 +12,10 @@ use Inertia\Response;
 
 class StudentController extends Controller
 {
+    public function __construct(
+        private readonly FeeBlockingService $feeBlockingService,
+    ) {}
+
     public function index(Request $request): Response
     {
         $students = Student::with('department')
@@ -22,11 +27,25 @@ class StudentController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $stats = [
+            'total' => Student::count(),
+            'active' => Student::where('is_active', true)->count(),
+            'by_department' => Department::withCount('students')
+                ->get()
+                ->map(fn ($d) => ['name' => $d->name, 'count' => $d->students_count]),
+            'by_year' => Student::selectRaw('year_of_study as year, count(*) as count')
+                ->groupBy('year_of_study')
+                ->orderBy('year_of_study')
+                ->get()
+                ->toArray(),
+        ];
+
         return Inertia::render('admin/students/index', [
             'students' => $students,
             'filters' => $request->only(['search', 'department_id', 'program', 'active']),
             'departments' => Department::orderBy('name')->get(),
             'programs' => Student::distinct()->orderBy('program')->pluck('program'),
+            'stats' => $stats,
         ]);
     }
 
@@ -56,8 +75,11 @@ class StudentController extends Controller
 
     public function show(Student $student): Response
     {
+        $examCardStatus = $this->feeBlockingService->checkExamCardStatus($student);
+
         return Inertia::render('admin/students/show', [
             'student' => $student->load('department'),
+            'exam_card_status' => $examCardStatus,
         ]);
     }
 

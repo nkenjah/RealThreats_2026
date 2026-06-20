@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             ActivityLogSeeder::class,
             ThreatAlertSeeder::class,
             ComprehensiveUniversitySeeder::class,
+            DemoDataSeeder::class,
         ]);
     }
 }

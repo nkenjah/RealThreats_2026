@@ -162,7 +162,13 @@ export default function StudentsIndex({
                     </div>
                 </div>
                 {view === 'dashboard' && stats ? (
-                    <StudentDashboard stats={stats} />
+                    <StudentDashboard
+                        total_students={stats.total}
+                        active_students={stats.active}
+                        departments_count={stats.by_department.length}
+                        by_department={stats.by_department}
+                        by_year={stats.by_year}
+                    />
                 ) : (
                     <DataTable
                         data={students}

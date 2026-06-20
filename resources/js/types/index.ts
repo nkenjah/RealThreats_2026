@@ -1,4 +1,4 @@
-export type * from './auth';
+export type { Passkey, TwoFactorSetupData, TwoFactorSecretKey } from './auth';
 export type * from './navigation';
 export type * from './ui';
 
@@ -6,6 +6,7 @@ export interface User {
     id: number;
     name: string;
     email: string;
+    avatar?: string;
     department_id: number | null;
     is_active: boolean;
     is_locked: boolean;
@@ -20,6 +21,7 @@ export interface User {
     department?: Department;
     risk_score?: UserRiskScore;
     sessionTracker?: UserSessionsTracker[];
+    two_factor_enabled?: boolean;
 }
 
 export interface ThreatAlert {
@@ -170,6 +172,19 @@ export interface Student {
     department?: Department;
 }
 
+export interface Attendance {
+    id: number;
+    student_id: number;
+    lecture_id: number;
+    status: string;
+    lecture_date: string;
+    notes: string | null;
+    created_at: string;
+    updated_at: string;
+    student?: Student;
+    lecture?: Lecture;
+}
+
 export interface PageProps {
     auth: {
         user: User;
@@ -179,6 +194,7 @@ export interface PageProps {
     notifications: AppNotification[];
     unread_count: number;
     flash?: { success?: string; error?: string };
+    [key: string]: unknown;
 }
 
 export interface AppNotification {

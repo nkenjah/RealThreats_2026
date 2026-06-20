@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit2, IdCard, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import ConfirmModal from '@/components/shared/ConfirmModal';
 import type { Department } from '@/types';
@@ -104,6 +104,17 @@ export default function FacultyShow({ facultyStaff }: Props) {
                                 </dd>
                             </div>
                         </dl>
+                    </div>
+                    <div className="mt-4">
+                        <Button variant="outline" size="sm" asChild>
+                            <Link
+                                href={`/admin/faculty/${facultyStaff.id}/id-card`}
+                                preserveScroll
+                            >
+                                <IdCard className="mr-2 h-4 w-4" />
+                                Download ID Card
+                            </Link>
+                        </Button>
                     </div>
                 </div>
             </div>

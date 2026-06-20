@@ -21,9 +21,18 @@ class AttendanceController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $stats = [
+            'present' => Attendance::where('status', 'present')->count(),
+            'absent' => Attendance::where('status', 'absent')->count(),
+            'late' => Attendance::where('status', 'late')->count(),
+            'excused' => Attendance::where('status', 'excused')->count(),
+            'total' => Attendance::count(),
+        ];
+
         return Inertia::render('admin/attendance/index', [
             'attendances' => $attendances,
             'filters' => $request->only(['search', 'status']),
+            'stats' => $stats,
         ]);
     }
 

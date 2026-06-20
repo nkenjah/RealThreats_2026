@@ -90,7 +90,8 @@ export default function ApplicationsShow({ application }: Props) {
                                     Reviewer
                                 </dt>
                                 <dd>
-                                    {application.reviewer?.name ?? 'Unassigned'}
+                                    {application.assigned_reviewer?.name ??
+                                        'Unassigned'}
                                 </dd>
                             </div>
                             <div className="flex justify-between">

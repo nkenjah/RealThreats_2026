@@ -6,6 +6,7 @@ use App\Models\AlumniProfile;
 use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,9 +22,28 @@ class AlumniProfileController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $stats = [
+            'total_alumni' => AlumniProfile::count(),
+            'employed' => AlumniProfile::whereNotNull('current_company')->count(),
+            'industries_count' => AlumniProfile::whereNotNull('industry')->distinct('industry')->count('industry'),
+            'graduation_years_count' => AlumniProfile::distinct('graduation_year')->count('graduation_year'),
+            'by_industry' => AlumniProfile::select('industry', DB::raw('count(*) as count'))
+                ->whereNotNull('industry')
+                ->groupBy('industry')
+                ->orderByDesc('count')
+                ->get()
+                ->toArray(),
+            'by_graduation_year' => AlumniProfile::select('graduation_year as year', DB::raw('count(*) as count'))
+                ->groupBy('graduation_year')
+                ->orderBy('graduation_year')
+                ->get()
+                ->toArray(),
+        ];
+
         return Inertia::render('admin/alumni/profiles/index', [
             'alumniProfiles' => $alumniProfiles,
             'filters' => $request->only(['search', 'industry', 'graduation_year']),
+            'stats' => $stats,
         ]);
     }
 

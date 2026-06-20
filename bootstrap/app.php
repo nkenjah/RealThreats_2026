@@ -1,16 +1,21 @@
 <?php
 
+use App\Http\Middleware\CheckUserLockStatus;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\TrackUserActivity;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         channels: __DIR__.'/../routes/channels.php',
         health: '/up',
@@ -19,16 +24,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->alias([
-            'track.activity' => \App\Http\Middleware\TrackUserActivity::class,
-            'check.lock' => \App\Http\Middleware\CheckUserLockStatus::class,
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'track.activity' => TrackUserActivity::class,
+            'check.lock' => CheckUserLockStatus::class,
+            'role' => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
         ]);
 
         $middleware->web(append: [
             HandleAppearance::class,
-            \App\Http\Middleware\CheckUserLockStatus::class,
-            \App\Http\Middleware\TrackUserActivity::class,
+            CheckUserLockStatus::class,
+            TrackUserActivity::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);

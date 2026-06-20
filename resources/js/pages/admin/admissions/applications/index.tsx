@@ -54,10 +54,10 @@ export default function ApplicationsIndex({
             ),
         },
         {
-            key: 'reviewer',
+            key: 'assigned_reviewer',
             label: 'Reviewer',
             render: (app: Application) =>
-                app.reviewer?.name ?? (
+                app.assigned_reviewer?.name ?? (
                     <span className="text-muted-foreground">Unassigned</span>
                 ),
         },

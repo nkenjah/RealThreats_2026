@@ -1,7 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, LayoutGrid, Table2 } from 'lucide-react';
+import { useState } from 'react';
 import DataTable from '@/components/shared/DataTable';
+import { FinanceDashboard } from '@/components/finance/finance-dashboard';
 
 interface Payment {
     id: number;
@@ -20,9 +22,19 @@ interface Payment {
 interface Props {
     payments: any;
     filters: Record<string, string | undefined>;
+    stats?: {
+        total_collected: number;
+        pending_payments: number;
+        pending_amount: number;
+        total_transactions: number;
+        by_method: { payment_method: string; count: number; total: number }[];
+        monthly_collections: { month: string; total: number }[];
+    };
 }
 
-export default function PaymentsIndex({ payments, filters }: Props) {
+export default function PaymentsIndex({ payments, filters, stats }: Props) {
+    const [view, setView] = useState<'table' | 'dashboard'>('table');
+
     const columns = [
         {
             key: 'student',
@@ -78,22 +90,57 @@ export default function PaymentsIndex({ payments, filters }: Props) {
         <>
             <Head title="Payments" />
 
-            <div className="space-y-6 p-6">
+            <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Payments</h1>
-                    <Button asChild>
-                        <Link href="/admin/payments/create">
-                            <Plus className="mr-2 h-4 w-4" /> Create Payment
-                        </Link>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center rounded-lg border p-0.5">
+                            <Button
+                                variant={
+                                    view === 'dashboard' ? 'secondary' : 'ghost'
+                                }
+                                size="sm"
+                                onClick={() => setView('dashboard')}
+                                className="h-7 px-2"
+                            >
+                                <LayoutGrid className="size-4" />
+                            </Button>
+                            <Button
+                                variant={
+                                    view === 'table' ? 'secondary' : 'ghost'
+                                }
+                                size="sm"
+                                onClick={() => setView('table')}
+                                className="h-7 px-2"
+                            >
+                                <Table2 className="size-4" />
+                            </Button>
+                        </div>
+                        <Button asChild>
+                            <Link href="/admin/payments/create">
+                                <Plus className="mr-2 h-4 w-4" /> Create Payment
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
-                <DataTable
-                    data={payments}
-                    columns={columns}
-                    filters={filters}
-                    searchPlaceholder="Search by student or method..."
-                />
+                {view === 'dashboard' && stats ? (
+                    <FinanceDashboard
+                        total_collected={stats.total_collected}
+                        pending_payments={stats.pending_payments}
+                        pending_amount={stats.pending_amount}
+                        total_transactions={stats.total_transactions}
+                        by_method={stats.by_method}
+                        monthly_collections={stats.monthly_collections}
+                    />
+                ) : (
+                    <DataTable
+                        data={payments}
+                        columns={columns}
+                        filters={filters}
+                        searchPlaceholder="Search by student or method..."
+                    />
+                )}
             </div>
         </>
     );
